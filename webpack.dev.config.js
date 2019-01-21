@@ -14,9 +14,9 @@ const templateList = fs.readdirSync(path.resolve(__dirname, templatePath)).map((
 })
 const Entries = {}
 const htmlPlugins = templateList.map((item, index) => {
-    Entries[item] = path.resolve(__dirname, `./src/entry/${item}.js`)
+    Entries[item] = ["react-hot-loader/patch",path.resolve(__dirname, `./src/entry/${item}.js`)]
     return new HtmlWebpackPlugin({
-        filename: path.resolve(__dirname, `./${item}.html`),
+        filename: path.resolve(__dirname, `${item}.html`),
         template: path.resolve(__dirname, `./src/template/${item}.html`),
         chunks: [item, "vendor"],
         inject: 'body',//指定js插入的位置，默认body，head插入head内，true插入body下面，false则不插入
@@ -35,7 +35,7 @@ module.exports={
     entry:Entries,
     output: {
         filename: "js/[name].bundle.js",
-        path: path.resolve(__dirname, "./"),//开发环境服务真正的目录
+        path: __dirname,//开发环境服务真正的目录,
     },
     devtool:"source-map",
     module: {
@@ -90,13 +90,18 @@ module.exports={
     },
     devServer:{
         port:8888,
-        contentBase:path.resolve(__dirname,"./"),
+        contentBase:path.resolve(__dirname,"/"),
         compress:true,//gzip压缩
         inline:true,//默认构建信息添加到控制台
         hot:true,
-        historyApiFallback:{
-            index:"./index.html",
-        }
+        //不知道为啥，死活不出来
+        // historyApiFallback:{
+        //     rewrites:[
+        //         {
+        //             from:/^\/home(\/)?/,to:"./index"
+        //         }
+        //     ]
+        // }
     },
     plugins:[
         new webpack.HotModuleReplacementPlugin(),
@@ -104,7 +109,7 @@ module.exports={
         //提取css
         // new ExtractTextWebpackPlugin("./dist/main.css")
         new MiniCssExtractPlugin({
-            filename:"./css/[name].css",//相对于output里的path的路径，不会重新计算路径
+            filename:"css/[name].css",//相对于output里的path的路径，不会重新计算路径
             chunkFilename:"[id].css",
         }),
     ]
